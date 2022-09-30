@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href=" https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+    <style>
+        .button {
+            margin: 20px;
+        }
+        .table {
+            margin: 20px;
+        }
+        #form {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="button">
+        <div style="float:right">
+            <button type="button" id="add" class="btn btn-primary ">Add Employee</button>
+        </div>
+    </div>
+    <!-- name -->
+    <form name="form" id="form" method="post">
+        <div class="container col-lg-6 border border-dark  md-2  ">
+            <div class="row ">
+                <div class="col-lg-4 p-3 mt-2 text-center">
+                    <lable for="name">EmployeeName</lable>
+                </div>
+                <div class="col-lg-4 p-3 mt-2">
+                    <input type="text" id="name" name="name" value="" autocomplete="off" placeholder="Employee Name">
+                    <label id="name-error" class="error" for="name" style="display:none ; color:  red">Please enter your
+                        name</label>
+                </div>
+            </div>
+            <!-- salary -->
+            <div class="row ">
+                <div class="col-lg-4 p-3 mt-2 text-center">
+                    <lable for="salary">EmployeeSalary</lable>
+                </div>
+                <div class="col-lg-4 p-3 mt-2">
+                    <input type="number" id="salary" name="salary" value="" autocomplete="off"
+                        placeholder="Employee Salary">
+                    <label id="salary-error" class="error" for="salary" style="display:none ; color:  red">Please enter
+                        your salary</label>
+                </div>
+            </div>
+            <!-- age -->
+            <div class="row ">
+                <div class="col-lg-4 p-3 mt-2 text-center">
+                    <lable for="age">EmployeeAge</lable>
+                </div>
+                <div class="col-lg-4 p-3 mt-2">
+                    <input type="number" id="age" name="age" value="" autocomplete="off" placeholder="Employee Age">
+                    <label id="age-error" class="error" for="age" style="display:none ; color:  red">Please select the
+                        age</label>
+
+                </div>
+            </div>
+            <!-- Image -->
+            <div class="row ">
+                <div class="col-lg-4 p-3 mt-2 text-center">
+                    <lable for="image">ProfileImage</lable>
+                </div>
+                <div class="col-lg-4 p-3 mt-2">
+                    <input type="file" id="image" name="image" onchange="imgtobase(this)">
+                    <label id="image-error" class="error" for="image" style="display:none ; color:  red">please select
+                        the image</label>
+                </div>
+            </div>
+            <!-- save and cancel -->
+            <div class="row mt-2">
+                <div class="col text-center mb-2">
+                    <button type="submit" id="submit">Submit</button>
+                    <button type="cancel" id="cancel">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <!-- table -->
+    <div class="table ">
+        <table id="example" class="display" style="width:100%">
+            <thead>
+                <tr>
+                    <th>EmployeeName</th>
+                    <th>EmployeeSalary</th>
+                    <th>EmployeeAge</th>
+                    <th>ProfileImage</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.js"></script>
+
+
+    <script>
+
+        $(document).ready(function () {
+            $('#example').DataTable({
+                ajax: 'https://dummy.restapiexample.com/api/v1/employees',
+                columns: [
+
+                    { data: 'employee_name' },
+                    { data: 'employee_salary' },
+                    { data: 'employee_age' },
+                    { data: 'profile_image' },
+                ],
+            });
+            //form validation
+            $("form[name='form']").validate({
+                rules: {
+                    name: "required",
+                    salary: "required",
+                    age: "required",
+                    image: "required",
+                },
+                messages: {
+                    name: "Please enter your name",
+                    salary: "Please enter your salary",
+                    age: "Please select the age",
+                    image: "please select the image",
+                },
+                submitHandler: function (form) {
+                    data();
+                    $("#form").hide();
+                    $(".table").show();
+                    $("#add").show();
+                    $("#name,#salary,#age,#image").val("");
+                }
+            });
+            //add the data
+            $("#add").click(function () {
+                $(this).hide();
+                $("#form").show();
+                $(".table").hide();
+            });
+            //cancel
+            $("#cancel").click(function () {
+                $("#form").hide();
+            })
+        });
+        //image base 64 encoder
+        function imgtobase(image) {
+            var img = image.files[0];
+            var reader = new FileReader();
+            reader.onloadend = function () {
+                imagelink = (reader.result);
+            }
+            reader.readAsDataURL(img);
+        }
+
+        //Submit
+        function data() {
+            var table = $('#example').DataTable();
+            var EmployeeName = $('#name').val();
+            console.log(EmployeeName);
+            var EmployeeSalary = $('#salary').val();
+            var EmployeeAge = $('#age').val();
+            var EmployeeImage = '<img src="' + imagelink + '" alt="' + imagelink + '"height="50" width="50"/>';
+             table.row.add({
+
+                "employee_name": EmployeeName,
+                "employee_salary": EmployeeSalary,
+                "employee_age": EmployeeAge,
+                "profile_image": EmployeeImage
+            }).draw();
+        }
+
+
+        // function data() {
+        //     var EmployeeName = $('#name').val();
+        //     var EmployeeSalary = $('#salary').val();
+        //     var EmployeeAge = $('#age').val();
+        //     var EmployeeImage = imagelink.val();
+        //     $('#example').prepend('<tr class="child"><td>' + EmployeeName + '</td><td>' + EmployeeSalary + '</td><td>' + EmployeeAge + '</td><td>' + EmployeeImage + '</td></tr>');
+        // }
+
+
+    </script>
+
+</body>
+
+</html>
